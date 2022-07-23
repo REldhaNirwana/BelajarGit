@@ -4,7 +4,13 @@ $koneksi = mysqli_connect("localhost", "root", "", "dbsewagedung");
 if(!$koneksi){
     die("koneksi dengan database gagal: ".mysqli_connect_error());
 }
-
+//Tambah Rupiah
+function rupiah($angka){
+	
+			$hasil_rupiah = "Rp " . number_format($angka,2,',','.');
+			return $hasil_rupiah;
+ 
+			}
 //Tambah gedung
 function tambahgedung($data){
         global $koneksi;
@@ -134,14 +140,15 @@ function tambahjadwal($data){
     global $koneksi;
 
     $id_jadwal = htmlspecialchars($data['id_jadwal']);
-    $paket = htmlspecialchars($data['paket']);
+    $id_gedung = $data['id_gedung'];
+    // $nama_gedung = htmlspecialchars($data['nama_gedung']);
     $tanggalpakai = htmlspecialchars($data['tanggalpakai']);
     $tanggalpakai = Date('Y-m-d', strtotime($tanggalpakai));
     $tanggaltempo = htmlspecialchars($data['tanggaltempo']);
     $tanggaltempo = Date('Y-m-d', strtotime($tanggaltempo));
     
 
-    $sql = "INSERT INTO jadwal_sewa VALUES ('$id_jadwal','$tanggalpakai','$tanggaltempo','$paket')";
+    $sql = "INSERT INTO jadwal_sewa VALUES ('$id_jadwal','$tanggalpakai','$tanggaltempo','$id_gedung')";
 
     mysqli_query($koneksi, $sql);
     return mysqli_affected_rows($koneksi);
@@ -174,6 +181,7 @@ function sewa($data){
     $tanggaltempo = Date('Y-m-d', strtotime($tanggaltempo));
     $lamasewa = htmlspecialchars($data['lamasewa']);
 	$id_gedung = htmlspecialchars($data['id_gedung']);
+
     
 
     $sql = "INSERT INTO sewa VALUES ('$id_sewa','$nama_penyewa','$username', '$alamat_penyewa','$telp_penyewa','$id_paket','$tanggalpakai','$tanggaltempo','$lamasewa','$id_gedung','$chk')";
@@ -207,17 +215,42 @@ function sewapaket($data){
     return mysqli_affected_rows($koneksi);
 
 }
-
 function reviewsend($data){
     global $koneksi;
 	
     $id_sewa = htmlspecialchars($data['id_sewa']);
     $reviewdata = htmlspecialchars($data['reviewdata']);
 	$username = htmlspecialchars($data['username']);
+	$nama_penyewa = htmlspecialchars($data['nama_penyewa']);
 	$denda = htmlspecialchars($data['denda']);
 	$status = htmlspecialchars($data['status']);
+	$tgl = htmlspecialchars($data['tgl']);
+    $tgl = Date('Y-m-d', strtotime($tgl));
+    $foto = upload();
 	
-    $sql = "INSERT INTO review VALUES ('$id_sewa','$reviewdata','$username','$denda','$status')";
+    $sql = "INSERT INTO review VALUES ('$id_sewa','$reviewdata','$username','$denda','$status','$foto','$nama_penyewa','$tgl')";
+
+    mysqli_query($koneksi, $sql);
+    return mysqli_affected_rows($koneksi);
+
+}
+
+
+function reviewsendsesudah($data){
+    global $koneksi;
+	
+    $id_sewa = htmlspecialchars($data['id_sewa']);
+    $reviewdata = htmlspecialchars($data['reviewdata']);
+	$username = htmlspecialchars($data['username']);
+	$nama_penyewa = htmlspecialchars($data['nama_penyewa']);
+	$denda = htmlspecialchars($data['denda']);
+	$status = htmlspecialchars($data['status']);
+	$foto = upload();
+	$tgl = htmlspecialchars($data['tgl']);
+    $tgl = Date('Y-m-d', strtotime($tgl));
+    $tgl_admin = '0';
+	
+    $sql = "INSERT INTO review_sesudah VALUES ('$id_sewa','$reviewdata','$username','$denda','$status','$foto','$nama_penyewa','$tgl','$tgl_admin')";
 
     mysqli_query($koneksi, $sql);
     return mysqli_affected_rows($koneksi);
@@ -237,8 +270,9 @@ function bayarsewa($data){
 	$totalbayar = htmlspecialchars($data['totalbayar']);
 	$nama_penyewa = htmlspecialchars($data['nama_penyewa']);
 	$tanggalpakai = htmlspecialchars($data['tanggalpakai']);
+	$tanggaltempo = htmlspecialchars($data['tanggaltempo']);
 
-    $sql = "INSERT INTO transaksi_sewa VALUES ('$id_bayar','$id_sewa','$norek','$foto','$username','$status','$totalbayar','$nama_penyewa','$tanggalpakai')";
+    $sql = "INSERT INTO transaksi_sewa VALUES ('$id_bayar','$id_sewa','$norek','$foto','$username','$status','$totalbayar','$nama_penyewa','$tanggalpakai','$tanggaltempo')";
 
     mysqli_query($koneksi, $sql);
     return mysqli_affected_rows($koneksi);
@@ -267,8 +301,11 @@ function reviewupdate($data){
 	$username= htmlspecialchars($data['username']);
 	$status= htmlspecialchars($data['status']);
 	
+	$tgl_admin = htmlspecialchars($data['tgl_admin']);
+    $tgl_admin = Date('Y-m-d', strtotime($tgl_admin));
+	
 
-    $sql = "UPDATE review SET denda= '$denda',reviewdata= '$reviewdata', status='$status' WHERE id_sewa = '$id_sewa'";
+    $sql = "UPDATE review_sesudah SET denda= '$denda',reviewdata= '$reviewdata', status='$status', tgl_admin= '$tgl_admin' WHERE id_sewa = '$id_sewa'";
 
     mysqli_query($koneksi, $sql);
 

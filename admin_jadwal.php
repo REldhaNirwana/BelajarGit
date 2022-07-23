@@ -1,5 +1,9 @@
-<?php 
-require 'function.php';
+<?php
+$tgl_admin =date('Y-m-d');
+$tampil2 =mysqli_query($koneksi,"SELECT * FROM gedung WHERE id_gedung='$id_gedung'");
+$hasil2 = mysqli_fetch_array($tampil2);
+$nama_gedung = $hasil2['nama_gedung'];
+
 ?>
 <div class="container-fluid">
 <div class="card">
@@ -17,7 +21,8 @@ require 'function.php';
             <thead>
                 <tr>
                 <th>No</th>
-                <th>ID Sewa</th>
+                <th>ID Jadwal</th>
+                <th>Gedung yang disewa</th>
                 <th>Tanggal Pakai</th>
                 <th>Tanggal Tempo</th>
                 <th>Action</th>
@@ -25,22 +30,28 @@ require 'function.php';
             </thead>
             <tbody>
 			<!--  WHERE paket=1  -- perintah menampilkan data berdasarkan paket yang 0 --> 
+          
+            
             <?php 
             $no = 1;
-
-            $tampil = mysqli_query($koneksi, "SELECT * FROM jadwal_sewa WHERE paket=0 ORDER BY id_jadwal DESC");
-
+            $tampil = mysqli_query($koneksi, "SELECT * FROM jadwal_sewa WHERE id_gedung=0 ORDER BY id_jadwal DESC");
             while($hasil = mysqli_fetch_array($tampil)){
             ?>
                        
                 <tr>
                     <td><?= $no++; ?></td>
-                    <td><?= $hasil['id_jadwal']; ?></td>
+                    <td><?= $hasil['id_jadwal']; ?></td> 
+                    <td><?= $hasil2['nama_gedung']; ?></td>
+                      
                     <td><?= $hasil['tanggalpakai']; ?></td>
-                    <td><?= $hasil['tanggaltempo']; ?></td>
+                    <td><?= $hasil['tanggaltempo']; ?>/<?= $tgl_admin ?> </td>
                     
                     <td>               
+                    <?php if ($hasil['tanggaltempo'] >=  $tgl_admin ) :?>           
+                        <a href="" class="btn btn-secondary btn-sm" style="font-weight: 600;" onclick="return confirm('Apakah anda yakin ingin menghapus data <?= $row['id_pesan']; ?> ?');"><i class="bi bi-trash-fill"></i>&nbsp;Hapus</a>
+                    <?php elseif ($hasil['tanggaltempo'] <=  $tgl_admin): ?>             
                         <a href="admin_hapus_jadwal.php?id_jadwal=<?= $hasil['id_jadwal'];?>" class="btn btn-danger btn-sm" style="font-weight: 600;" onclick="return confirm('Apakah anda yakin ingin menghapus data <?= $row['id_pesan']; ?> ?');"><i class="bi bi-trash-fill"></i>&nbsp;Hapus</a>
+                    <?php endif ?></a>
                     </td>
                 </tr>
             <?php } ?>
@@ -52,50 +63,6 @@ require 'function.php';
 		</div>
         </div>
 
-        <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Data Jadwal Paket</h6>
-        </div>
-        <div class="card-body">
-        <div class="table-responsive">
-        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-            <thead>
-                <tr>
-                <th>No</th>
-                <th>ID Sewa</th>
-                <th>Tanggal Pakai</th>
-                <th>Tanggal Tempo</th>
-                <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-			<!--  WHERE paket=1  -- perintah menampilkan data berdasarkan paket yang 1--> 
-            <?php 
-            $no = 1;
-
-            $tampil = mysqli_query($koneksi, "SELECT * FROM jadwal_sewa WHERE paket=1 ORDER BY id_jadwal DESC");
-
-            while($hasil = mysqli_fetch_array($tampil)){
-            ?>
-                       
-                <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= $hasil['id_jadwal']; ?></td>
-                    <td><?= $hasil['tanggalpakai']; ?></td>
-                    <td><?= $hasil['tanggaltempo']; ?></td>
-                    
-                    <td>               
-                        <a href="admin_hapus_jadwal.php?id_jadwal=<?= $hasil['id_jadwal'];?>" class="btn btn-danger btn-sm" style="font-weight: 600;" onclick="return confirm('Apakah anda yakin ingin menghapus data <?= $row['id_pesan']; ?> ?');"><i class="bi bi-trash-fill"></i>&nbsp;Hapus</a>
-                    </td>
-                </tr>
-            <?php } ?>
-            </tbody>
-
-        </table>
-
-        </div>
-		</div>
-        </div>
         </div>
         </div>
         </div>
